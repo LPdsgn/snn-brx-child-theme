@@ -2207,12 +2207,35 @@ CRITICAL REMINDERS:
                 const cfg = snnBricksChatConfig.ai;
                 if (!cfg.apiKey || !cfg.apiEndpoint) throw new Error('AI API not configured');
                 ChatState.abortController = new AbortController();
-                const body = { model: cfg.model, messages, temperature: 0.7, max_tokens: opts.maxTokens || cfg.maxTokens || 4000 };
-                debugLog('AI call:', body.model, messages.length, 'messages');
+
+                let headers, reqBody;
+                if (cfg.provider === 'anthropic') {
+                    const systemMsgs = messages.filter(m => m.role === 'system');
+                    const nonSystemMsgs = messages.filter(m => m.role !== 'system');
+                    const systemText = systemMsgs.map(m => m.content).join('\n\n');
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'x-api-key': cfg.apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    };
+                    reqBody = JSON.stringify({
+                        model: cfg.model,
+                        max_tokens: opts.maxTokens || cfg.maxTokens || 4000,
+                        system: systemText || undefined,
+                        messages: nonSystemMsgs,
+                        temperature: 0.7
+                    });
+                } else {
+                    headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.apiKey}` };
+                    reqBody = JSON.stringify({ model: cfg.model, messages, temperature: 0.7, max_tokens: opts.maxTokens || cfg.maxTokens || 4000 });
+                }
+
+                debugLog('AI call:', cfg.model, messages.length, 'messages');
                 const resp = await fetch(cfg.apiEndpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.apiKey}` },
-                    body: JSON.stringify(body),
+                    headers: headers,
+                    body: reqBody,
                     signal: ChatState.abortController.signal
                 });
                 if (resp.status === 429 && retryCount < RECOVERY_CONFIG.maxRecoveryAttempts) {
@@ -2223,6 +2246,10 @@ CRITICAL REMINDERS:
                 }
                 if (!resp.ok) { const t = await resp.text(); throw new Error(`API error ${resp.status}: ${t.substring(0, 200)}`); }
                 const data = await resp.json();
+                if (cfg.provider === 'anthropic') {
+                    if (data.content && data.content.length && data.content[0].text) return data.content[0].text;
+                    throw new Error('Invalid Anthropic API response');
+                }
                 if (!data?.choices?.[0]?.message?.content) throw new Error('Invalid API response');
                 return data.choices[0].message.content;
             }

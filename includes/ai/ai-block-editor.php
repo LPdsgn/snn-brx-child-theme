@@ -64,6 +64,7 @@ function snn_enqueue_block_editor_ai_assets() {
 
     // Pass config to JavaScript
     wp_localize_script('wp-plugins', 'snnAiConfig', array(
+        'provider' => $config['provider'],
         'apiKey' => $config['apiKey'],
         'model' => $config['model'],
         'systemPrompt' => $config['systemPrompt'],
@@ -451,6 +452,48 @@ function snn_add_block_editor_ai_panel() {
     (function() {
         'use strict';
 
+        function snnBuildAIRequest(config, messages, extraBody = {}) {
+            if (config.provider === 'anthropic') {
+                const systemMsgs = messages.filter(m => m.role === 'system');
+                const nonSystemMsgs = messages.filter(m => m.role !== 'system');
+                const systemText = systemMsgs.map(m => m.content).join('\n\n');
+                return {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': config.apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify(Object.assign({
+                        model: config.model,
+                        max_tokens: extraBody.max_tokens || 4096,
+                        system: systemText || undefined,
+                        messages: nonSystemMsgs
+                    }, extraBody, { max_tokens: extraBody.max_tokens || 4096 }))
+                };
+            }
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify(Object.assign({ model: config.model, messages }, extraBody))
+            };
+        }
+
+        function snnParseAIResponse(config, data) {
+            if (config.provider === 'anthropic') {
+                if (data.content && data.content.length && data.content[0].text) {
+                    return data.content[0].text.trim();
+                }
+                return null;
+            }
+            if (data.choices && data.choices.length && data.choices[0].message && data.choices[0].message.content) {
+                return data.choices[0].message.content.trim();
+            }
+            return null;
+        }
+
         // Wait for WordPress editor to be ready
         function initAIPanel() {
             if (!window.wp || !window.wp.data || !window.wp.plugins || !window.wp.element || !window.wp.editPost) {
@@ -787,13 +830,11 @@ function snn_add_block_editor_ai_panel() {
                 }
 
                 try {
+                    const reqOpts = snnBuildAIRequest(config, messages);
                     const fetchResponse = await fetch(config.apiEndpoint, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${config.apiKey}`
-                        },
-                        body: JSON.stringify({ model: config.model, messages })
+                        headers: reqOpts.headers,
+                        body: reqOpts.body
                     });
 
                     if (!fetchResponse.ok) {
@@ -810,8 +851,8 @@ function snn_add_block_editor_ai_panel() {
                     }
 
                     const data = await fetchResponse.json();
-                    if (data.choices && data.choices.length && data.choices[0].message && data.choices[0].message.content) {
-                        aiResponse = data.choices[0].message.content.trim();
+                    aiResponse = snnParseAIResponse(config, data);
+                    if (aiResponse) {
                         responseDiv.textContent = aiResponse;
                         responseDiv.style.display = 'block';
                         copyButton.style.display = 'inline-block';

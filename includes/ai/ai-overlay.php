@@ -343,11 +343,54 @@ function snn_add_ai_script_to_footer() {
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const config = {
+            provider: <?php echo json_encode($config['provider']); ?>,
             apiKey: <?php echo json_encode($config['apiKey']); ?>,
             model: <?php echo json_encode($config['model']); ?>,
             systemPrompt: <?php echo json_encode($config['systemPrompt']); ?>,
             apiEndpoint: <?php echo json_encode($config['apiEndpoint']); ?>
         };
+
+        function snnBuildAIRequest(config, messages, extraBody = {}) {
+            if (config.provider === 'anthropic') {
+                const systemMsgs = messages.filter(m => m.role === 'system');
+                const nonSystemMsgs = messages.filter(m => m.role !== 'system');
+                const systemText = systemMsgs.map(m => m.content).join('\n\n');
+                return {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': config.apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify(Object.assign({
+                        model: config.model,
+                        max_tokens: extraBody.max_tokens || 4096,
+                        system: systemText || undefined,
+                        messages: nonSystemMsgs
+                    }, extraBody, { max_tokens: extraBody.max_tokens || 4096 }))
+                };
+            }
+            return {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify(Object.assign({ model: config.model, messages }, extraBody))
+            };
+        }
+
+        function snnParseAIResponse(config, data) {
+            if (config.provider === 'anthropic') {
+                if (data.content && data.content.length && data.content[0].text) {
+                    return data.content[0].text.trim();
+                }
+                return null;
+            }
+            if (data.choices && data.choices.length && data.choices[0].message && data.choices[0].message.content) {
+                return data.choices[0].message.content.trim();
+            }
+            return null;
+        }
 
         let actionPresets = <?php echo json_encode($config['actionPresets']); ?>;
         if (!Array.isArray(actionPresets)) {
@@ -653,13 +696,11 @@ function snn_add_ai_script_to_footer() {
             }
 
             try {
+                const reqOpts = snnBuildAIRequest(config, messages);
                 const fetchResponse = await fetch(config.apiEndpoint, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.apiKey}`
-                    },
-                    body: JSON.stringify({ model: config.model, messages })
+                    headers: reqOpts.headers,
+                    body: reqOpts.body
                 });
 
                 if (!fetchResponse.ok) {
@@ -676,8 +717,8 @@ function snn_add_ai_script_to_footer() {
                 }
 
                 const data = await fetchResponse.json();
-                if (data.choices && data.choices.length && data.choices[0].message && data.choices[0].message.content) {
-                    aiResponse = data.choices[0].message.content.trim();
+                aiResponse = snnParseAIResponse(config, data);
+                if (aiResponse) {
                     if(responseDiv) {
                         responseDiv.textContent = aiResponse;
                         responseDiv.style.display = 'block';
@@ -1052,13 +1093,11 @@ function snn_add_ai_script_to_footer() {
             messages.push({ role: 'user', content: userInstruction });
 
             try {
+                const bulkReqOpts = snnBuildAIRequest(config, messages);
                 const fetchResponse = await fetch(config.apiEndpoint, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.apiKey}`
-                    },
-                    body: JSON.stringify({ model: config.model, messages })
+                    headers: bulkReqOpts.headers,
+                    body: bulkReqOpts.body
                 });
 
                 if (!fetchResponse.ok) {
@@ -1071,8 +1110,8 @@ function snn_add_ai_script_to_footer() {
                 }
 
                 const data = await fetchResponse.json();
-                if (data.choices && data.choices.length && data.choices[0].message && data.choices[0].message.content) {
-                    bulkAiRawResponse = data.choices[0].message.content.trim();
+                bulkAiRawResponse = snnParseAIResponse(config, data);
+                if (bulkAiRawResponse) {
                     if(bulkAiResponseDisplay) {
                         bulkAiResponseDisplay.textContent = "AI Response (Preview - texts separated by ||):\n\n" + bulkAiRawResponse;
                         bulkAiResponseDisplay.style.display = 'block';

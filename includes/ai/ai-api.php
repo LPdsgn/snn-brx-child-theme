@@ -69,6 +69,10 @@ function snn_get_ai_api_config() {
         $apiKey      = get_option('snn_custom_api_key', '');
         $model       = get_option('snn_custom_model', '');
         $apiEndpoint = get_option('snn_custom_api_endpoint', '');
+    } elseif ($ai_provider === 'anthropic') {
+        $apiKey      = get_option('snn_anthropic_api_key', '');
+        $model       = get_option('snn_anthropic_model', 'claude-sonnet-4-20250514');
+        $apiEndpoint = 'https://api.anthropic.com/v1/messages';
     } elseif ($ai_provider === 'openrouter') {
         $apiKey      = $openrouter_api_key;
         $model       = $openrouter_model;
@@ -99,6 +103,7 @@ function snn_get_ai_api_config() {
 
     // Build the configuration array
     $config = [
+        'provider'        => $ai_provider,
         'apiKey'          => $apiKey,
         'model'           => $model,
         'apiEndpoint'     => $apiEndpoint,

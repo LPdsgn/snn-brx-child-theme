@@ -69,6 +69,10 @@ function snn_register_ai_settings() {
     register_setting('snn_ai_settings_group', 'snn_custom_api_endpoint');
     register_setting('snn_ai_settings_group', 'snn_custom_model');
 
+    // Register settings for Anthropic provider
+    register_setting('snn_ai_settings_group', 'snn_anthropic_api_key');
+    register_setting('snn_ai_settings_group', 'snn_anthropic_model');
+
     // 2. Register multimodal configuration settings
     register_setting('snn_ai_settings_group', 'snn_ai_image_aspect_ratio', [
         'type' => 'string',
@@ -148,6 +152,7 @@ function snn_render_ai_settings() {
                     <td>
                         <select name="snn_ai_provider" id="snn_ai_provider">
                             <option value="openrouter" <?php selected($ai_provider, 'openrouter'); ?>>OpenRouter</option>
+                            <option value="anthropic" <?php selected($ai_provider, 'anthropic'); ?>>Anthropic</option>
                             <option value="openai" <?php selected($ai_provider, 'openai'); ?>>OpenAI (Will Be Deprecated and Removed Soon)</option>
                             <option value="custom" <?php selected($ai_provider, 'custom'); ?>>Custom</option>
                         </select>
@@ -354,6 +359,59 @@ function snn_render_ai_settings() {
             </div>
 
             <div
+                id="anthropic-settings"
+                style="display: <?php echo ($ai_provider === 'anthropic' && $ai_enabled === 'yes') ? 'block' : 'none'; ?>;"
+            >
+                <h2><?php esc_html_e('Anthropic API Settings', 'snn'); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row">
+                            <label for="snn_anthropic_api_key"><?php esc_html_e('Anthropic API Key', 'snn'); ?></label>
+                        </th>
+                        <td>
+                            <input
+                                type="password"
+                                name="snn_anthropic_api_key"
+                                id="snn_anthropic_api_key"
+                                value="<?php echo esc_attr(get_option('snn_anthropic_api_key', '')); ?>"
+                                class="regular-text"
+                            />
+                            <p class="description">
+                                <?php printf(
+                                    __('Get your API key from %s', 'snn'),
+                                    '<a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>'
+                                ); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="snn_anthropic_model"><?php esc_html_e('Anthropic Model', 'snn'); ?></label>
+                        </th>
+                        <td>
+                            <input
+                                type="text"
+                                name="snn_anthropic_model"
+                                id="snn_anthropic_model"
+                                placeholder="claude-sonnet-4-20250514"
+                                value="<?php echo esc_attr(get_option('snn_anthropic_model', 'claude-sonnet-4-20250514')); ?>"
+                                class="regular-text"
+                                list="anthropic-models"
+                            />
+                            <datalist id="anthropic-models">
+                                <option value="claude-opus-4-0-20250514">
+                                <option value="claude-sonnet-4-20250514">
+                                <option value="claude-haiku-4-20250414">
+                            </datalist>
+                            <p class="description">
+                                <a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank"><?php esc_html_e('Model Info & Pricing', 'snn'); ?></a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div
                 id="custom-settings"
                 style="display: <?php echo ($ai_provider === 'custom' && $ai_enabled === 'yes') ? 'block' : 'none'; ?>;"
             >
@@ -526,6 +584,7 @@ function snn_render_ai_settings() {
             const providerSelect = document.getElementById('snn_ai_provider');
             const openaiSettingsDiv = document.getElementById('openai-settings');
             const openrouterSettingsDiv = document.getElementById('openrouter-settings');
+            const anthropicSettingsDiv = document.getElementById('anthropic-settings');
             const customSettingsDiv = document.getElementById('custom-settings');
 
             // Model feature display elements
@@ -553,6 +612,7 @@ function snn_render_ai_settings() {
                 const isEnabled = enableCheckbox.checked;
                 openaiSettingsDiv.style.display = 'none';
                 openrouterSettingsDiv.style.display = 'none';
+                anthropicSettingsDiv.style.display = 'none';
                 customSettingsDiv.style.display = 'none';
 
                 // Hide feature divs when provider changes or AI is disabled
@@ -570,6 +630,8 @@ function snn_render_ai_settings() {
                         openrouterSettingsDiv.style.display = 'block';
                         fetchOpenRouterModels();
                         fetchOpenRouterImageModels();
+                    } else if (providerSelect.value === 'anthropic') {
+                        anthropicSettingsDiv.style.display = 'block';
                     } else if (providerSelect.value === 'custom') {
                         customSettingsDiv.style.display = 'block';
                     }

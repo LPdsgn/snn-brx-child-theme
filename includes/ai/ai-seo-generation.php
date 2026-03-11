@@ -59,6 +59,7 @@ function snn_seo_ai_enqueue_admin_scripts($hook) {
         ?>
         <script>
         window.snnSeoAiConfig = <?php echo json_encode(array(
+            'provider' => $config['provider'],
             'apiKey' => $config['apiKey'],
             'model' => $config['model'],
             'apiEndpoint' => $config['apiEndpoint'],
@@ -1399,35 +1400,56 @@ Return ONLY a JSON object with this exact structure: {"title": "...", "descripti
         
         // Call AI API
         async function callAI(prompt) {
-            const requestBody = {
-                model: config.model,
-                messages: [
-                    { role: 'system', content: config.systemPrompt },
-                    { role: 'user', content: prompt }
-                ],
-                temperature: 0.7,
-                max_tokens: 300
-            };
-            
+            const messages = [
+                { role: 'system', content: config.systemPrompt },
+                { role: 'user', content: prompt }
+            ];
+            const extraBody = { temperature: 0.7, max_tokens: 300 };
+
             if (config.responseFormat && config.responseFormat.type) {
-                requestBody.response_format = { type: 'json_object' };
+                extraBody.response_format = { type: 'json_object' };
             }
-            
-            const response = await fetch(config.apiEndpoint, {
-                method: 'POST',
-                headers: {
+
+            let headers, body;
+            if (config.provider === 'anthropic') {
+                headers = {
+                    'Content-Type': 'application/json',
+                    'x-api-key': config.apiKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true'
+                };
+                body = JSON.stringify({
+                    model: config.model,
+                    max_tokens: 300,
+                    system: config.systemPrompt,
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7
+                });
+            } else {
+                headers = {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${config.apiKey}`
-                },
-                body: JSON.stringify(requestBody)
+                };
+                body = JSON.stringify(Object.assign({ model: config.model, messages }, extraBody));
+            }
+
+            const response = await fetch(config.apiEndpoint, {
+                method: 'POST',
+                headers: headers,
+                body: body
             });
-            
+
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
-            
+
             const data = await response.json();
-            let content = data.choices[0].message.content;
+            let content;
+            if (config.provider === 'anthropic') {
+                content = data.content && data.content[0] ? data.content[0].text : '';
+            } else {
+                content = data.choices[0].message.content;
+            }
             
             // Strip markdown code blocks if present (e.g., ```json ... ```)
             content = content.replace(/```json\s*/g, '').replace(/```/g, '').trim();

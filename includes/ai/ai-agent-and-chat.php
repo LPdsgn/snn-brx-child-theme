@@ -2389,18 +2389,41 @@ VALIDATION REQUIREMENTS:
                 try {
                     ChatState.abortController = new AbortController();
 
-                    const response = await fetch(config.apiEndpoint, {
-                        method: 'POST',
-                        headers: {
+                    let headers, body;
+                    if (config.provider === 'anthropic') {
+                        const systemMsgs = messages.filter(m => m.role === 'system');
+                        const nonSystemMsgs = messages.filter(m => m.role !== 'system');
+                        const systemText = systemMsgs.map(m => m.content).join('\n\n');
+                        headers = {
+                            'Content-Type': 'application/json',
+                            'x-api-key': config.apiKey,
+                            'anthropic-version': '2023-06-01',
+                            'anthropic-dangerous-direct-browser-access': 'true'
+                        };
+                        body = JSON.stringify({
+                            model: config.model,
+                            max_tokens: config.maxTokens || 4000,
+                            system: systemText || undefined,
+                            messages: nonSystemMsgs,
+                            temperature: 0.7
+                        });
+                    } else {
+                        headers = {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${config.apiKey}`
-                        },
-                        body: JSON.stringify({
+                        };
+                        body = JSON.stringify({
                             model: config.model,
                             messages: messages,
                             temperature: 0.7,
                             max_tokens: config.maxTokens || 4000
-                        }),
+                        });
+                    }
+
+                    const response = await fetch(config.apiEndpoint, {
+                        method: 'POST',
+                        headers: headers,
+                        body: body,
                         signal: ChatState.abortController.signal
                     });
 
@@ -2457,11 +2480,17 @@ VALIDATION REQUIREMENTS:
                     }
 
                     const data = await response.json();
-                    
+
                     // Reset recovery attempts on success
                     ChatState.recoveryAttempts = 0;
                     ChatState.lastError = null;
-                    
+
+                    if (config.provider === 'anthropic') {
+                        if (data.content && data.content.length && data.content[0].text) {
+                            return data.content[0].text;
+                        }
+                        throw new Error('Invalid Anthropic API response');
+                    }
                     return data.choices[0].message.content;
                     
                 } catch (error) {
