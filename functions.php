@@ -13,9 +13,9 @@ require_once SNN_PATH . 'includes/settings-page.php';
 
 require_once SNN_PATH . 'includes/other-settings.php';
 require_once SNN_PATH . 'includes/security-page.php';
-require_once SNN_PATH . 'includes/post-types-settings.php';
-require_once SNN_PATH . 'includes/custom-field-settings.php';
-require_once SNN_PATH . 'includes/taxonomy-settings.php';
+// require_once SNN_PATH . 'includes/post-types-settings.php';
+// require_once SNN_PATH . 'includes/custom-field-settings.php';
+// require_once SNN_PATH . 'includes/taxonomy-settings.php';
 require_once SNN_PATH . 'includes/login-settings.php';
 require_once SNN_PATH . 'includes/remove-wp-version.php';
 require_once SNN_PATH . 'includes/disable-xmlrpc.php';
@@ -85,11 +85,7 @@ require_once SNN_PATH . 'includes/ai/abilities/analyze-post-seo.php';
 require_once SNN_PATH . 'includes/ai/ai-agent-and-chat-bricks.php';
 
 
-
-
-
-
-
+// WordPress Customization
 require_once SNN_PATH . 'includes/block-editor-settings.php';
 require_once SNN_PATH . 'includes/media-image-opt.php';
 require_once SNN_PATH . 'includes/wp-admin-dashboard-widgets.php';
