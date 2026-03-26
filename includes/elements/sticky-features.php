@@ -77,39 +77,93 @@ class Prefix_Element_Sticky_Features extends Element {
             'step'    => 0.05,
         ];
 
+        $this->controls['sfScrollHeight'] = [
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Viewport Height', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'height',
+                    'selector' => '.sf-scroll',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '100vh',
+        ];
+
         $this->controls['sfGap'] = [
-            'group'   => 'layout',
-            'label'   => esc_html__( 'Column Gap', 'snn' ),
-            'type'    => 'text',
-            'default' => '1.25em',
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Column Gap', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'gap',
+                    'selector' => '.sf-items',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '1.25em',
         ];
 
         $this->controls['sfMaxWidth'] = [
-            'group'   => 'layout',
-            'label'   => esc_html__( 'Max Width', 'snn' ),
-            'type'    => 'text',
-            'default' => '70em',
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Max Width', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'max-width',
+                    'selector' => '.sf-items',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '70em',
         ];
 
         $this->controls['sfAspectRatio'] = [
-            'group'   => 'layout',
-            'label'   => esc_html__( 'Media Aspect Ratio', 'snn' ),
-            'type'    => 'text',
-            'default' => '1 / 1.3',
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Media Aspect Ratio', 'snn' ),
+            'type'        => 'text',
+            'css'         => [
+                [
+                    'property' => 'aspect-ratio',
+                    'selector' => '.sf-item-media::before',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '1 / 1.3',
         ];
 
         $this->controls['sfBorderRadius'] = [
-            'group'   => 'layout',
-            'label'   => esc_html__( 'Media Border Radius', 'snn' ),
-            'type'    => 'text',
-            'default' => '0.75em',
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Media Border Radius', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'border-radius',
+                    'selector' => '.sf-item-media',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '0.75em',
         ];
 
         $this->controls['sfTextMaxWidth'] = [
-            'group'   => 'layout',
-            'label'   => esc_html__( 'Text Max Width', 'snn' ),
-            'type'    => 'text',
-            'default' => '27.5em',
+            'group'       => 'layout',
+            'label'       => esc_html__( 'Text Max Width', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'max-width',
+                    'selector' => '.sf-item-text > *',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '27.5em',
         ];
 
         $this->controls['sfShowProgress'] = [
@@ -134,10 +188,18 @@ class Prefix_Element_Sticky_Features extends Element {
         ];
 
         $this->controls['sfProgressHeight'] = [
-            'group'   => 'progress',
-            'label'   => esc_html__( 'Bar Height', 'snn' ),
-            'type'    => 'text',
-            'default' => '0.25em',
+            'group'       => 'progress',
+            'label'       => esc_html__( 'Bar Height', 'snn' ),
+            'type'        => 'number',
+            'units'       => true,
+            'css'         => [
+                [
+                    'property' => 'height',
+                    'selector' => '.sf-progress',
+                ],
+            ],
+            'inline'      => true,
+            'placeholder' => '0.25em',
         ];
     }
 
@@ -233,15 +295,45 @@ class Prefix_Element_Sticky_Features extends Element {
     }
 
     public function enqueue_scripts() {
+        wp_enqueue_style(
+            'snn-sticky-features',
+            SNN_URL_ASSETS . 'css/sticky-features.css',
+            [],
+            '1.2'
+        );
         wp_enqueue_script( 'gsap-js' );
         wp_enqueue_script( 'gsap-st-js' );
         wp_enqueue_script(
-            'snn-sticky-features',
+            'snn-sticky-features-js',
             SNN_URL_ASSETS . 'js/sticky-features.js',
             [ 'gsap-js', 'gsap-st-js' ],
             '1.2',
             true
         );
+    }
+
+    /**
+     * Extract a CSS-ready color string from a Bricks color control value.
+     * Handles: raw CSS variable, hex, hex+opacity (rgba), or fallback.
+     */
+    private static function resolve_color( $color_value, $fallback = '' ) {
+        if ( ! is_array( $color_value ) ) {
+            return $fallback;
+        }
+        // CSS variable (raw) takes priority
+        if ( ! empty( $color_value['raw'] ) ) {
+            return $color_value['raw'];
+        }
+        if ( ! empty( $color_value['hex'] ) ) {
+            $hex = $color_value['hex'];
+            $op  = isset( $color_value['opacity'] ) ? floatval( $color_value['opacity'] ) : 1;
+            if ( $op < 1 ) {
+                list( $r, $g, $b ) = sscanf( $hex, '#%02x%02x%02x' );
+                return "rgba({$r},{$g},{$b},{$op})";
+            }
+            return $hex;
+        }
+        return $fallback;
     }
 
     public function render() {
@@ -250,28 +342,14 @@ class Prefix_Element_Sticky_Features extends Element {
         $duration      = floatval( $s['sfDuration'] ?? 0.75 );
         $ease          = $s['sfEase'] ?? 'power4.inOut';
         $scroll_amount = floatval( $s['sfScrollAmount'] ?? 0.9 );
-        $gap           = esc_attr( $s['sfGap'] ?? '1.25em' );
-        $max_width     = esc_attr( $s['sfMaxWidth'] ?? '70em' );
-        $aspect_ratio  = esc_attr( $s['sfAspectRatio'] ?? '1 / 1.3' );
-        $br            = esc_attr( $s['sfBorderRadius'] ?? '0.75em' );
-        $text_max_w    = esc_attr( $s['sfTextMaxWidth'] ?? '27.5em' );
         $show_progress = ! empty( $s['sfShowProgress'] );
-        $prog_h        = esc_attr( $s['sfProgressHeight'] ?? '0.25em' );
 
-        $prog_color = '#fff';
-        if ( ! empty( $s['sfProgressColor']['hex'] ) ) {
-            $prog_color = esc_attr( $s['sfProgressColor']['hex'] );
-        }
-        $prog_bg = 'rgba(255,255,255,0.15)';
-        if ( ! empty( $s['sfProgressBg']['hex'] ) ) {
-            $op = isset( $s['sfProgressBg']['opacity'] ) ? floatval( $s['sfProgressBg']['opacity'] ) : 1;
-            if ( $op < 1 ) {
-                list( $r, $g, $b ) = sscanf( $s['sfProgressBg']['hex'], '#%02x%02x%02x' );
-                $prog_bg = "rgba({$r},{$g},{$b},{$op})";
-            } else {
-                $prog_bg = esc_attr( $s['sfProgressBg']['hex'] );
-            }
-        }
+        // Border radius — needed as CSS var (used in clip-path in CSS + JS)
+        $br = esc_attr( $s['sfBorderRadius'] ?? '0.75em' );
+
+        // Progress bar colors — Bricks color controls don't have a `css` mechanism for custom props
+        $prog_color = self::resolve_color( $s['sfProgressColor'] ?? null, '#fff' );
+        $prog_bg    = self::resolve_color( $s['sfProgressBg'] ?? null, 'rgba(255,255,255,0.15)' );
 
         if ( ! empty( $this->attributes['_root']['id'] ) ) {
             $root_id = $this->attributes['_root']['id'];
@@ -280,16 +358,13 @@ class Prefix_Element_Sticky_Features extends Element {
             $this->set_attribute( '_root', 'id', $root_id );
         }
 
-        // CSS custom properties for per-instance dynamic values
-        $css_vars  = "--sf-gap:{$gap};";
-        $css_vars .= "--sf-max-w:{$max_width};";
-        $css_vars .= "--sf-ratio:{$aspect_ratio};";
-        $css_vars .= "--sf-br:{$br};";
-        $css_vars .= "--sf-text-max-w:{$text_max_w};";
+        // CSS custom properties — only for values NOT handled by Bricks' css mechanism
+        // gap, max-width, aspect-ratio, border-radius, text-max-width, prog-height
+        // are all applied by Bricks via the 'css' key on each control.
+        $css_vars  = "--sf-br:" . esc_attr( $br ) . ";";
         if ( $show_progress ) {
-            $css_vars .= "--sf-prog-h:{$prog_h};";
-            $css_vars .= "--sf-prog-color:{$prog_color};";
-            $css_vars .= "--sf-prog-bg:{$prog_bg};";
+            $css_vars .= "--sf-prog-color:" . esc_attr( $prog_color ) . ";";
+            $css_vars .= "--sf-prog-bg:" . esc_attr( $prog_bg ) . ";";
         }
 
         $this->set_attribute( '_root', 'data-sf-wrap', '' );
@@ -300,203 +375,6 @@ class Prefix_Element_Sticky_Features extends Element {
         $this->set_attribute( '_root', 'style', $css_vars );
 
         echo "<div {$this->render_attributes( '_root' )}>";
-
-        // ====== CSS — no #{id} scoping: Bricks per-element styles (#brxe-xyz) always win ======
-        echo "<style>
-/*
- * Sticky Features — structural + default visual styles
- * Selectors use bare .sf-* classes (specificity 0,0,1,0).
- * Bricks per-element styles (#brxe-xyz, specificity 0,1,0,0) always override these.
- * Dynamic per-instance values come from CSS custom properties on [data-sf-wrap].
- */
-
-[data-sf-wrap] {
-    width: 100%;
-    position: relative;
-}
-
-.sf-scroll {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    position: relative;
-}
-
-/* Grid container — all items overlap in one row */
-.sf-items {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sf-gap, 1.25em);
-    width: 100%;
-    max-width: var(--sf-max-w, 70em);
-    margin: 0 auto;
-}
-
-/* display:contents → media & text become direct grid children */
-.sf-item {
-    display: contents !important;
-}
-
-/* Media column — display:block overrides Bricks flex so ::before aspect-ratio works */
-.sf-item-media {
-    display: block !important;
-    grid-column: 1;
-    grid-row: 1;
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--sf-br, 0.75em);
-    clip-path: inset(50% round var(--sf-br, 0.75em));
-}
-
-.sf-item:first-child .sf-item-media,
-.sf-items > :first-child.sf-item-media {
-    clip-path: inset(0% round var(--sf-br, 0.75em));
-}
-
-.sf-item-media::before {
-    content: '';
-    display: block;
-    width: 100%;
-    aspect-ratio: var(--sf-ratio, 1 / 1.3);
-}
-
-.sf-item-media > * {
-    position: absolute !important;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-.sf-item-media img,
-.sf-item-media video {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-/* Text column — overlapping in grid-row:1, col 2 */
-.sf-item-text {
-    grid-column: 2;
-    grid-row: 1;
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 1.5em;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.sf-item:first-child .sf-item-text,
-.sf-items > :first-child.sf-item-text {
-    opacity: 1;
-    visibility: visible;
-}
-
-.sf-item-text > * {
-    max-width: var(--sf-text-max-w, 27.5em);
-}
-
-/* Default visual styles — easily overridden from Bricks panel */
-.sf-tag {
-    font-size: 1em;
-    line-height: 1;
-    display: inline-block;
-}
-
-.sf-heading {
-    margin: 0;
-    font-size: 3.75em;
-    font-weight: 500;
-    line-height: 1;
-}
-
-.sf-desc {
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 0;
-    font-size: 1.25em;
-    line-height: 1.2;
-}
-
-.sf-link {
-    color: #fff;
-    text-decoration: underline;
-    font-size: 1.25em;
-    line-height: 1.2;
-    cursor: pointer;
-}
-
-/* Progress bar */
-.sf-progress {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: end;
-    height: var(--sf-prog-h, 0.25em);
-    background: var(--sf-prog-bg, rgba(255,255,255,0.15));
-    z-index: 2;
-    pointer-events: none;
-    border-radius: 0 0 var(--sf-br, 0.75em) var(--sf-br, 0.75em);
-    overflow: hidden;
-}
-
-.sf-progress-bar {
-    width: 100%;
-    height: 100%;
-    background: var(--sf-prog-color, #fff);
-    transform: scaleX(0);
-    transform-origin: 0% 50%;
-}
-
-/* Mobile */
-@media screen and (max-width: 767px) {
-    .sf-scroll {
-        height: auto;
-        min-height: 100svh;
-        padding: 1.25em 0 2.5em;
-        align-items: flex-start;
-    }
-    .sf-items {
-        grid-template-columns: 1fr !important;
-    }
-    .sf-item-media {
-        grid-column: 1;
-    }
-    .sf-item-media::before {
-        aspect-ratio: 1;
-    }
-    .sf-item-text {
-        grid-column: 1;
-        grid-row: 2;
-    }
-    .sf-item-text > * { max-width: none; }
-    .sf-heading { font-size: 2.5em; }
-    .sf-desc, .sf-link { font-size: 1em; }
-}
-
-/* Builder preview: all items visible, stacked vertically */
-.iframe .sf-scroll { height: auto; }
-.iframe .sf-items {
-    grid-template-columns: 1fr 1fr !important;
-    grid-auto-rows: auto;
-}
-.iframe .sf-item {
-    display: grid !important;
-    grid-template-columns: subgrid;
-    grid-column: 1 / -1;
-}
-.iframe .sf-item-media {
-    grid-row: auto;
-    clip-path: inset(0% round var(--sf-br, 0.75em)) !important;
-}
-.iframe .sf-item-text {
-    grid-row: auto;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-.iframe .sf-progress { display: none; }
-</style>";
 
         // DOM structure
         echo '<div class="sf-scroll">';
