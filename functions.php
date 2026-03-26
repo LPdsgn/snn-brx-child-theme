@@ -173,6 +173,7 @@ if (!empty($options['enqueue_gsap'])) {
     \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gsap-animations-code.php');
     \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gsap-text-animations.php');
     \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/svg-animation.php');
+    \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/sticky-features.php');
     
 }
 
