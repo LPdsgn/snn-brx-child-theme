@@ -40,9 +40,8 @@
       var progressBar = w.querySelector('[data-sf-progress]');
 
       // Config from data attributes
-      var duration    = parseFloat(w.getAttribute('data-sf-duration')) || 0.75;
-      var ease        = w.getAttribute('data-sf-ease') || 'power4.inOut';
-      var scrollAmount = parseFloat(w.getAttribute('data-sf-scroll-amount')) || 0.9;
+      var duration     = parseFloat(w.getAttribute('data-sf-duration')) || 0.75;
+      var ease         = w.getAttribute('data-sf-ease') || 'power4.inOut';
       var borderRadius = w.getAttribute('data-sf-border-radius') || '0.75em';
 
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) duration = 0.01;
@@ -133,6 +132,7 @@
       }
 
       // ── ScrollTrigger ──
+      // Each slide gets equal scroll distance: total = (count - 1) * 100vh
       var steps = Math.max(1, count - 1);
 
       ScrollTrigger.create({
@@ -144,12 +144,11 @@
         scrub: true,
         invalidateOnRefresh: true,
         onUpdate: function (self) {
-          var p = Math.min(self.progress, scrollAmount) / scrollAmount;
-          var idx = Math.floor(p * steps + 1e-6);
-          idx = Math.max(0, Math.min(steps, idx));
+          // Equal distribution: each slide visible for 1/count of the scroll
+          var idx = Math.min(Math.floor(self.progress * count), count - 1);
 
           if (progressBar) {
-            gsap.set(progressBar, { scaleX: p });
+            gsap.set(progressBar, { scaleX: self.progress });
           }
 
           if (idx !== currentIndex) {

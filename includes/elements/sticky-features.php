@@ -67,16 +67,6 @@ class Prefix_Element_Sticky_Features extends Element {
             'default' => 'power4.inOut',
         ];
 
-        $this->controls['sfScrollAmount'] = [
-            'group'   => 'animation',
-            'label'   => esc_html__( 'Scroll Range Used', 'snn' ),
-            'type'    => 'number',
-            'default' => 0.9,
-            'min'     => 0.1,
-            'max'     => 1,
-            'step'    => 0.05,
-        ];
-
         $this->controls['sfScrollHeight'] = [
             'group'       => 'layout',
             'label'       => esc_html__( 'Viewport Height', 'snn' ),
@@ -129,7 +119,7 @@ class Prefix_Element_Sticky_Features extends Element {
             'css'         => [
                 [
                     'property' => 'aspect-ratio',
-                    'selector' => '.sf-item-media::before',
+                    'selector' => '.sf-item-media',
                 ],
             ],
             'inline'      => true,
@@ -341,11 +331,12 @@ class Prefix_Element_Sticky_Features extends Element {
 
         $duration      = floatval( $s['sfDuration'] ?? 0.75 );
         $ease          = $s['sfEase'] ?? 'power4.inOut';
-        $scroll_amount = floatval( $s['sfScrollAmount'] ?? 0.9 );
         $show_progress = ! empty( $s['sfShowProgress'] );
 
         // Border radius — needed as CSS var (used in clip-path in CSS + JS)
-        $br = esc_attr( $s['sfBorderRadius'] ?? '0.75em' );
+        $br    = esc_attr( $s['sfBorderRadius'] ?? '0.75em' );
+        // Aspect ratio — needed as CSS var (used in mobile media query)
+        $ratio = esc_attr( $s['sfAspectRatio'] ?? '1 / 1.3' );
 
         // Progress bar colors — Bricks color controls don't have a `css` mechanism for custom props
         $prog_color = self::resolve_color( $s['sfProgressColor'] ?? null, '#fff' );
@@ -362,6 +353,7 @@ class Prefix_Element_Sticky_Features extends Element {
         // gap, max-width, aspect-ratio, border-radius, text-max-width, prog-height
         // are all applied by Bricks via the 'css' key on each control.
         $css_vars  = "--sf-br:" . esc_attr( $br ) . ";";
+        $css_vars .= "--sf-ratio:" . esc_attr( $ratio ) . ";";
         if ( $show_progress ) {
             $css_vars .= "--sf-prog-color:" . esc_attr( $prog_color ) . ";";
             $css_vars .= "--sf-prog-bg:" . esc_attr( $prog_bg ) . ";";
@@ -370,7 +362,6 @@ class Prefix_Element_Sticky_Features extends Element {
         $this->set_attribute( '_root', 'data-sf-wrap', '' );
         $this->set_attribute( '_root', 'data-sf-duration', $duration );
         $this->set_attribute( '_root', 'data-sf-ease', $ease );
-        $this->set_attribute( '_root', 'data-sf-scroll-amount', $scroll_amount );
         $this->set_attribute( '_root', 'data-sf-border-radius', $br );
         $this->set_attribute( '_root', 'style', $css_vars );
 
