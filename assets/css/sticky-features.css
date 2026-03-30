@@ -46,7 +46,7 @@
   min-height: 0;
   border-radius: var(--sf-br, 0.75em);
   clip-path: inset(50% round var(--sf-br, 0.75em));
-  aspect-ratio: var(--sf-ratio);
+  /* aspect-ratio: var(--sf-ratio, 1 / 1.3); */
   width: auto;
   margin-inline: auto;
 }
@@ -125,8 +125,11 @@
   cursor: pointer;
 }
 
-/* Progress bar */
+/* Progress bar — width set by JS to match first media element */
 .sf-progress {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--sf-prog-max-w, unset);
   grid-column: 1;
   grid-row: 1;
   align-self: end;
@@ -148,6 +151,9 @@
 
 /* Mobile */
 @media screen and (max-width: 767px) {
+  .sf-progress {
+    max-width: 100%;
+  }
   .sf-scroll {
     height: auto;
     min-height: 100svh;
@@ -155,13 +161,13 @@
     align-items: flex-start;
   }
   .sf-items {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
   .sf-item-media {
     grid-column: 1;
     height: auto;
-    aspect-ratio: var(--sf-ratio, 1);
-	 margin-inline: unset;
+    /* aspect-ratio: var(--sf-ratio, 1 / 1.3); */
+    margin-inline: unset;
   }
   .sf-item-text {
     grid-column: 1;

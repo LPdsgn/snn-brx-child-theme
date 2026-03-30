@@ -135,6 +135,19 @@
       // Each slide gets equal scroll distance: total = (count - 1) * 100vh
       var steps = Math.max(1, count - 1);
 
+      // ── Sync progress bar width to first media element ──
+      var progressWrap = progressBar ? progressBar.parentElement : null;
+      var firstMedia = medias[0];
+
+      if (progressWrap && firstMedia) {
+        var syncProgressWidth = function () {
+          progressWrap.style.setProperty('--sf-prog-max-w', firstMedia.offsetWidth + 'px');
+        };
+        syncProgressWidth();
+        window.addEventListener('resize', syncProgressWidth);
+        ScrollTrigger.addEventListener('refresh', syncProgressWidth);
+      }
+
       ScrollTrigger.create({
         trigger: w,
         start: 'center center',
