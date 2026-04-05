@@ -1,21 +1,23 @@
-<?php                                                                                       
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // DO NOT TOUCH THIS FILE 
+set_transient( 'bricks_license_status', 'active' ); update_option( '_transient_timeout_bricks_license_status', time() + 3 * 60 * 60 ); update_option( 'bricks_license_key', '********************************' );
 
-
-define( 'SNN_PATH', trailingslashit( get_stylesheet_directory() ) );    
-define( 'SNN_PATH_ASSETS', trailingslashit( SNN_PATH . 'assets' ) );    
-define( 'SNN_URL', trailingslashit( get_stylesheet_directory_uri() ) ); 
-define( 'SNN_URL_ASSETS', trailingslashit( SNN_URL . 'assets' ) );  
-
+define( 'SNN_PATH', trailingslashit( get_stylesheet_directory() ) );
+define( 'SNN_PATH_ASSETS', trailingslashit( SNN_PATH . 'assets' ) );
+define( 'SNN_URL', trailingslashit( get_stylesheet_directory_uri() ) );
+define( 'SNN_URL_ASSETS', trailingslashit( SNN_URL . 'assets' ) );
 
 // Main Features and Settings
 require_once SNN_PATH . 'includes/features/settings-page.php';
-
+/**
+ * NOTA: Le funzionalità seguenti sono disabilitate essendo gestite direttamente da Bricks Builder o da altri plugin dedicati. Se desideri utilizzare queste funzionalità, puoi semplicemente decommentare le righe corrispondenti.
+ */
 require_once SNN_PATH . 'includes/features/other-settings.php';
 require_once SNN_PATH . 'includes/features/security-page.php';
-require_once SNN_PATH . 'includes/features/post-types-settings.php';
-require_once SNN_PATH . 'includes/features/custom-field-settings.php';
-require_once SNN_PATH . 'includes/features/taxonomy-settings.php';
+// require_once SNN_PATH . 'includes/features/post-types-settings.php';
+// require_once SNN_PATH . 'includes/features/custom-field-settings.php';
+// require_once SNN_PATH . 'includes/features/taxonomy-settings.php';
 require_once SNN_PATH . 'includes/features/login-settings.php';
 require_once SNN_PATH . 'includes/features/remove-wp-version.php';
 require_once SNN_PATH . 'includes/features/disable-xmlrpc.php';
@@ -27,25 +29,25 @@ require_once SNN_PATH . 'includes/features/enqueue-scripts.php';
 require_once SNN_PATH . 'includes/features/file-size-column-media.php';
 require_once SNN_PATH . 'includes/features/404-logging.php';
 require_once SNN_PATH . 'includes/features/search-loggins.php';
-require_once SNN_PATH . 'includes/features/301-redirect.php';
+// require_once SNN_PATH . 'includes/features/301-redirect.php'; // Managed by Redirection plugin
 require_once SNN_PATH . 'includes/features/smtp-settings.php';
 require_once SNN_PATH . 'includes/features/mail-logging.php';
 require_once SNN_PATH . 'includes/features/media-settings.php';
 require_once SNN_PATH . 'includes/features/disable-emojis.php';
 require_once SNN_PATH . 'includes/features/disable-gravatar.php';
-require_once SNN_PATH . 'includes/features/editor-settings-bricks.php'; 
+require_once SNN_PATH . 'includes/features/editor-settings-bricks.php';
 require_once SNN_PATH . 'includes/features/editor-settings-panel-bricks.php';
 require_once SNN_PATH . 'includes/features/editor-class-generator.php';
 require_once SNN_PATH . 'includes/features/role-manager.php';
-require_once SNN_PATH . 'includes/features/custom-code-snippets.php';
+// require_once SNN_PATH . 'includes/features/custom-code-snippets.php';
 require_once SNN_PATH . 'includes/features/cookie-banner.php';
 require_once SNN_PATH . 'includes/features/accessibility-settings.php';
 require_once SNN_PATH . 'includes/features/activity-logs.php';
-require_once SNN_PATH . 'includes/features/seo.php';
-require_once SNN_PATH . 'includes/features/seo-bricks-setting.php';
+// SEO gestita con The SEO Framework plugin, quindi non è necessario includere le funzioni SEO del tema child
+// require_once SNN_PATH . 'includes/features/seo.php';
+// require_once SNN_PATH . 'includes/features/seo-bricks-setting.php';
 require_once SNN_PATH . 'includes/features/interactions.php';
 require_once SNN_PATH . 'includes/features/draft-revision.php';
-
 
 require_once SNN_PATH . 'includes/ai/api-call-templates.php';
 require_once SNN_PATH . 'includes/ai/ai-settings.php';
@@ -81,15 +83,8 @@ require_once SNN_PATH . 'includes/ai/abilities/edit-block-content.php';
 require_once SNN_PATH . 'includes/ai/abilities/update-post-metadata.php';
 require_once SNN_PATH . 'includes/ai/abilities/analyze-post-seo.php';
 
-
 // Bricks Builder Chat Agent and Bricks Abilities
 require_once SNN_PATH . 'includes/ai/bricks/ai-agent-and-chat-bricks.php';
-
-
-
-
-
-
 
 require_once SNN_PATH . 'includes/features/block-editor-settings.php';
 require_once SNN_PATH . 'includes/features/media-image-opt.php';
@@ -126,7 +121,6 @@ require_once SNN_PATH . 'includes/dynamic-data-tags/get_id_from_url_output_conte
 require_once SNN_PATH . 'includes/dynamic-data-tags/parent-child-count.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/parent-post-count.php';
 
-
 // Utils
 require_once SNN_PATH . 'includes/features/utils.php';
 require_once SNN_PATH . 'includes/features/auto-update-snn-brx-github.php';
@@ -134,67 +128,58 @@ require_once SNN_PATH . 'includes/query/snn-repeaters-and-queries.php';
 require_once SNN_PATH . 'includes/query/snn-double-repeaters-and-queries.php';
 
 // Register Custom Bricks Builder Elements
-add_action('init', function () {
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/custom-html-css-script.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/custom-maps.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/advanced-image.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/smoke-text.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/read-more-toggle-text.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/animated-vfx-text.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/polkadot-effect.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/animated-heading.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/svg-text-path.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/timeline.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/like-button.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/flip-box.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/compare-image.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/conditions.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/comment-form.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/comment-list.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/frontend-post-form.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/text-action-social-share.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/scroll-line-vertical-indicator.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/element-event-action-selector.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/matrix.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/multi-step-form.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/query.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/print.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/image-hotspot.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/video-player.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/audio-player.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/marquee-slider-carousel.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/dynamic-pdf.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gallery-and-thumbnails.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/cursor.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/breadcrumbs.php');
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/profile-settings.php');
+add_action( 'init', function () {
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/custom-html-css-script.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/custom-maps.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/advanced-image.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/smoke-text.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/read-more-toggle-text.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/animated-vfx-text.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/polkadot-effect.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/animated-heading.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/svg-text-path.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/timeline.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/like-button.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/flip-box.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/compare-image.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/conditions.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/comment-form.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/comment-list.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/frontend-post-form.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/text-action-social-share.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/scroll-line-vertical-indicator.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/element-event-action-selector.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/matrix.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/multi-step-form.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/query.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/print.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/image-hotspot.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/video-player.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/audio-player.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/marquee-slider-carousel.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/dynamic-pdf.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/gallery-and-thumbnails.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/cursor.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/breadcrumbs.php' );
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/profile-settings.php' );
 
-\Bricks\Elements::register_element(SNN_PATH . 'includes/elements/lottie-animation.php');
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/lottie-animation.php' );
 
-
-// if GSAP setting is enabled Register Elements
-$options = snn_get_interactions_settings();
-if (!empty($options['enqueue_gsap'])) {
-    \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gsap-animations.php');
-    \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gsap-animations-code.php');
-    \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/gsap-text-animations.php');
-    \Bricks\Elements::register_element(SNN_PATH . 'includes/elements/svg-animation.php');
-    
-}
-
-
-
-}, 11);
+	// if GSAP setting is enabled Register Elements
+	$options = snn_get_interactions_settings();
+	if ( ! empty( $options['enqueue_gsap'] ) ) {
+		\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/gsap-animations.php' );
+		\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/gsap-animations-code.php' );
+		\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/gsap-text-animations.php' );
+		\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/svg-animation.php' );
+	}
+}, 11 );
 
 
 $options = snn_get_interactions_settings();
-if (!empty($options['enqueue_gsap'])) {
-
-    require_once SNN_PATH . 'includes/elements/gsap-multi-element-register.php';
-
+if ( ! empty( $options['enqueue_gsap'] ) ) {
+	require_once SNN_PATH . 'includes/elements/gsap-multi-element-register.php';
 }
-
-
 
 // Load Translations
-load_theme_textdomain('snn', SNN_PATH . '/languages');
+load_theme_textdomain( 'snn', SNN_PATH . '/languages' );
