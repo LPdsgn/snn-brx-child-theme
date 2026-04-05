@@ -32,7 +32,7 @@ require_once SNN_PATH . 'includes/features/search-loggins.php';
 // require_once SNN_PATH . 'includes/features/301-redirect.php'; // Managed by Redirection plugin
 require_once SNN_PATH . 'includes/features/smtp-settings.php';
 require_once SNN_PATH . 'includes/features/mail-logging.php';
-require_once SNN_PATH . 'includes/features/media-settings.php';
+// require_once SNN_PATH . 'includes/features/media-settings.php';
 require_once SNN_PATH . 'includes/features/disable-emojis.php';
 require_once SNN_PATH . 'includes/features/disable-gravatar.php';
 require_once SNN_PATH . 'includes/features/editor-settings-bricks.php';
