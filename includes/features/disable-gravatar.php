@@ -38,7 +38,17 @@ function snn_maybe_disable_gravatar() {
 add_action('init', 'snn_maybe_disable_gravatar');
 
 // Function to return an empty string, effectively disabling Gravatar
+// Skips users that have a local avatar set via the Local User Avatar feature
 function snn_disable_gravatar($avatar, $id_or_email) {
+    if ( function_exists( 'snn_lua_get_user_id' ) ) {
+        $user_id = snn_lua_get_user_id( $id_or_email );
+        if ( $user_id ) {
+            $attachment_id = get_user_meta( $user_id, 'snn_local_avatar_attachment_id', true );
+            if ( ! empty( $attachment_id ) && is_numeric( $attachment_id ) ) {
+                return $avatar; // Let the local avatar filter handle it
+            }
+        }
+    }
     return '';
 }
 ?>

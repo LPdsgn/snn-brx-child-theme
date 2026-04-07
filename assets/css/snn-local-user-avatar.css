@@ -1,0 +1,41 @@
+/* Avatar preview on profile page */
+.snn-avatar-preview {
+    border-radius: 2px;
+    cursor: pointer;
+    object-fit: cover;
+}
+.snn-avatar-btn-container {
+    margin-top: 8px;
+}
+.snn-avatar-btn-container .button {
+    margin-right: 6px;
+}
+
+/* Hide the default WP avatar row until JS replaces it (prevents flash) */
+tr.user-profile-picture:not(#snn-local-user-avatar) {
+    display: none;
+}
+
+/* Fix avatar in admin bar */
+img.avatar {
+    object-fit: cover;
+}
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-empty-item img,
+#wpadminbar #wp-admin-bar-my-account.with-avatar > a img {
+    width: 16px;
+    object-fit: cover;
+}
+
+/* Simplify the media frame for avatar selection */
+.snn-lua-media-frame .media-frame-menu-heading,
+.snn-lua-media-frame .media-frame-menu,
+.snn-lua-media-frame .media-types-required-info,
+.snn-lua-media-frame .attachment-display-settings {
+    display: none;
+}
+.snn-lua-media-frame .media-frame-title,
+.snn-lua-media-frame .media-frame-router,
+.snn-lua-media-frame .media-frame-content,
+.snn-lua-media-frame .media-frame-toolbar {
+    left: 0;
+}

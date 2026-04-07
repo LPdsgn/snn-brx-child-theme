@@ -131,6 +131,14 @@ function snn_register_other_settings() {
     );
 
     add_settings_field(
+        'enable_local_avatar',
+        __('Enable Local User Avatar', 'snn'),
+        'snn_enable_local_avatar_callback',
+        'snn-other-settings',
+        'snn_other_settings_section'
+    );
+
+    add_settings_field(
         'enable_admin_mega_menu',
         __('Enable Admin Mega Menu in Admin Bar', 'snn'),
         'snn_enable_admin_mega_menu_callback',
@@ -165,6 +173,7 @@ function snn_sanitize_other_settings($input) {
     $sanitized['enable_admin_bar_toggle'] = isset($input['enable_admin_bar_toggle']) && $input['enable_admin_bar_toggle'] ? 1 : 0;
     $sanitized['disable_admin_bar_roles'] = isset($input['disable_admin_bar_roles']) && is_array($input['disable_admin_bar_roles']) ? array_map('sanitize_text_field', $input['disable_admin_bar_roles']) : array();
     $sanitized['disable_dashboard_widgets'] = isset($input['disable_dashboard_widgets']) && $input['disable_dashboard_widgets'] ? 1 : 0;
+    $sanitized['enable_local_avatar'] = isset($input['enable_local_avatar']) && $input['enable_local_avatar'] ? 1 : 0;
     $sanitized['enable_admin_mega_menu'] = isset($input['enable_admin_mega_menu']) && $input['enable_admin_mega_menu'] ? 1 : 0;
     $sanitized['admin_mega_menu_priority'] = isset($input['admin_mega_menu_priority']) && $input['admin_mega_menu_priority'] !== '' ? intval($input['admin_mega_menu_priority']) : 35;
 
@@ -650,6 +659,19 @@ function snn_disable_admin_bar_for_roles() {
     }
 }
 add_action('after_setup_theme', 'snn_disable_admin_bar_for_roles');
+
+/**
+ * Settings field callback for Local User Avatar.
+ */
+function snn_enable_local_avatar_callback() {
+    $options = get_option('snn_other_settings');
+    ?>
+    <label>
+        <input type="checkbox" name="snn_other_settings[enable_local_avatar]" value="1" <?php checked(1, isset($options['enable_local_avatar']) ? $options['enable_local_avatar'] : 0); ?>>
+        <?php _e('Enable local profile pictures. Users can upload an avatar from the Media Library instead of using Gravatar.', 'snn'); ?>
+    </label>
+    <?php
+}
 
 /**
  * Settings field callback for Admin Mega Menu.
