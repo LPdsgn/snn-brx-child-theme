@@ -1,0 +1,57 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "snn/download-box",
+	"version": "1.0.0",
+	"title": "Download Box",
+	"category": "media",
+	"icon": "download",
+	"description": "Box di download con file allegato, titolo, didascalia e pulsante.",
+	"textdomain": "snn",
+	"attributes": {
+		"fileId": {
+			"type": "number",
+			"default": 0
+		},
+		"fileUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"fileName": {
+			"type": "string",
+			"default": ""
+		},
+		"titolo": {
+			"type": "string",
+			"default": ""
+		},
+		"didascalia": {
+			"type": "string",
+			"default": ""
+		},
+		"mostraPulsante": {
+			"type": "boolean",
+			"default": false
+		},
+		"testoPulsante": {
+			"type": "string",
+			"default": ""
+		},
+		"marginTop": {
+			"type": "string",
+			"default": ""
+		},
+		"marginBottom": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": false
+	},
+	"editorScript": "file:./edit.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

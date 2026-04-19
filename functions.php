@@ -121,6 +121,13 @@ require_once SNN_PATH . 'includes/dynamic-data-tags/current-author.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/get_id_from_url_output_content.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/parent-child-count.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/parent-post-count.php';
+require_once SNN_PATH . 'includes/dynamic-data-tags/post-is-sticky.php';
+require_once SNN_PATH . 'includes/dynamic-data-tags/post-terms-extended.php';
+
+// Register Custom Gutenberg Blocks
+add_action( 'init', function () {
+	register_block_type( SNN_PATH . 'blocks/download-box' );
+});
 
 // Utils
 require_once SNN_PATH . 'includes/features/utils.php';

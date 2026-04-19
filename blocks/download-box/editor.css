@@ -1,0 +1,94 @@
+/* Download Box — Editor */
+.download-box-editor .download-box {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	flex-wrap: nowrap;
+	background-color: #ffeced;
+	text-decoration: none;
+	color: inherit;
+	cursor: default;
+}
+
+.download-box-editor .download-box__icon-wrap {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #ffeced;
+	padding: 1rem 0.75rem;
+}
+
+.download-box-editor .download-box__icon-svg {
+	display: block;
+	height: 1.5rem;
+	width: 1.5rem;
+	min-width: fit-content;
+}
+
+.download-box-editor .download-box__info {
+	flex-grow: 1;
+	padding: 0.75rem;
+	row-gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.download-box-editor .download-box__text {
+	font-family: "Hind", ui-sans-serif, system-ui, sans-serif;
+	color: #a7043d;
+	line-height: 1.2;
+}
+
+.download-box-editor .download-box__text p {
+	margin: 0;
+}
+
+.download-box-editor .download-box__caption {
+	font-size: 0.75rem;
+}
+
+.download-box-editor .download-box__button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	border-width: 0;
+	letter-spacing: 0.5px;
+	font-family: "Hind", ui-sans-serif, system-ui, sans-serif;
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1;
+	text-align: left;
+	padding: 0;
+	justify-content: space-between;
+	width: auto;
+	max-width: 100%;
+}
+
+.download-box-editor .download-box__button [class^="ti-"] {
+	speak: never;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
+	font-family: themify;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 1;
+	text-transform: none;
+}
+
+.download-box-editor .download-box-placeholder {
+	padding: 32px;
+	border: 2px dashed #D1D5DB;
+	border-radius: 8px;
+	text-align: center;
+	color: #6B7280;
+}
+
+.snn-db-file-info p {
+	margin: 0 0 8px;
+	font-weight: 500;
+	word-break: break-all;
+}
