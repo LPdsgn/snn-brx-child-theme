@@ -26,6 +26,7 @@ require_once SNN_PATH . 'includes/features/remove-rss.php';
 require_once SNN_PATH . 'includes/features/disable-wp-json-if-not-logged-in.php';
 require_once SNN_PATH . 'includes/features/login-logo-change-url-change.php';
 require_once SNN_PATH . 'includes/features/enqueue-scripts.php';
+require_once SNN_PATH . 'includes/features/icon-font-lucide.php';
 require_once SNN_PATH . 'includes/features/file-size-column-media.php';
 require_once SNN_PATH . 'includes/features/404-logging.php';
 require_once SNN_PATH . 'includes/features/search-loggins.php';
@@ -123,6 +124,7 @@ require_once SNN_PATH . 'includes/dynamic-data-tags/parent-child-count.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/parent-post-count.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/post-is-sticky.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/post-terms-extended.php';
+require_once SNN_PATH . 'includes/dynamic-data-tags/term-description.php';
 
 // Register Custom Gutenberg Blocks
 add_action( 'init', function () {
@@ -137,6 +139,7 @@ require_once SNN_PATH . 'includes/query/snn-double-repeaters-and-queries.php';
 
 // Register Custom Bricks Builder Elements
 add_action( 'init', function () {
+	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/icon-lucide.php' );
 	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/custom-html-css-script.php' );
 	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/custom-maps.php' );
 	\Bricks\Elements::register_element( SNN_PATH . 'includes/elements/advanced-image.php' );
