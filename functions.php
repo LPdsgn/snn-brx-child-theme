@@ -125,6 +125,7 @@ require_once SNN_PATH . 'includes/dynamic-data-tags/parent-post-count.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/post-is-sticky.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/post-terms-extended.php';
 require_once SNN_PATH . 'includes/dynamic-data-tags/term-description.php';
+require_once SNN_PATH . 'includes/dynamic-data-tags/context-detection.php';
 
 // Register Custom Gutenberg Blocks
 add_action( 'init', function () {
